@@ -1,0 +1,518 @@
+// .my-nav {
+//     background-color: #E19200 !important;
+//     color:#fff;
+// }
+
+// .my-nav .open {
+//     margin-right: 20px;
+// }
+
+// .my-nav .navbar-brand {
+//     margin: auto;
+//     color:#fff;
+// }
+
+.toggle {
+    background-color: #FFA519;
+    border-color: #FFA519;
+}
+
+
+.preloader {
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  position: fixed;
+  z-index: 99999;
+  background: #fff; }
+  .preloader .cssload-speeding-wheel {
+    position: absolute;
+    top: calc(50% - 3.5px);
+    left: calc(50% - 3.5px); }
+
+.welcome p {
+    color:#222;
+    padding-top:5px;
+}
+
+.welcome .my-row {
+    display: flex;
+    flex-direction:row;
+}
+
+.sidebar-header p {
+    color: #fff;
+}
+
+#app {
+    transition: margin-left .5s;
+}
+
+//Dashboard Cards
+
+.data {
+    transition: margin-left 0.5s !important;
+    overflow-x: hidden;
+    margin-top:0px;
+}
+
+.data .card {
+    margin-bottom: 20px;
+    border-radius: 10px;
+//     box-shadow:
+//   0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+//   0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+//   0 12.5px 10px rgba(0, 0, 0, 0.06),
+//   0 22.3px 17.9px rgba(0, 0, 0, 0.072),
+//   0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+//   0 100px 80px rgba(0, 0, 0, 0.12)
+}
+
+.data .card-header {
+    // background-color: #A1B3B7 !important;
+    background-color: #343a40 !important;
+}
+
+.data h1 {
+    color: #FFA519;
+    margin-bottom: 10px;
+    font-size:50px;
+}
+
+.data i {
+    font-size:13px;
+}
+
+.data p {
+    font-weight:700;
+}
+
+// .data .card {
+//     box-shadow: 0 0 0 0.2rem #F4F4F4;
+// }
+
+
+.data .card-header {
+    color:#fff;
+    font-weight:700;
+}
+
+//Account Cards
+
+.data .info h2 {
+    color:#FFA519;
+}
+
+.data .info p {
+    font-weight:unset; 
+    font-size:15px;
+}
+
+.data .meter p {
+    font-weight:400 !important; 
+    font-size:15px;
+    color: #636b6f;
+}
+
+.data .meter hr {
+    margin:0px 0px !important;
+}
+
+.data .meter .card-body {
+    padding:0px !important;
+}
+
+.data .meter .flex-container {
+    display: flex; 
+    justify-content: space-between;
+    padding:1.25em 1.25em 0px 1.25em !important;
+}
+
+.data .meter .flex-container .left {
+    font-weight:700;
+}
+
+.data .meter .flex-container .right {
+    color: #FFA519;
+}
+
+//Meter cards
+
+.data .meter .alert-form {
+    margin:20px;
+}
+
+.data .meter .alert-btn {
+    border-color: #FFA519 !important;
+    width:100%;
+}
+
+.data .meter label {
+    font-weight:400;
+}
+
+// .sidenav {
+//   height: 100%;
+//   width: 0;
+//   position: fixed;
+//   z-index: 1;
+//   top: 0;
+//   left: 0;
+//   background-color: #E19200;
+//   overflow-x: hidden;
+//   transition: 0.5s;
+//   padding-top: 60px;
+// }
+
+// .sidenav a {
+//   padding: 8px 8px 8px 32px;
+//   text-decoration: none;
+//   font-size: 25px;
+//   color: #fff;
+//   display: block;
+//   transition: 0.3s;
+// }
+
+// .sidenav a:hover {
+//   color:rgb(199, 199, 199);
+// }
+
+// .sidenav .closebtn {
+//   position: absolute;
+//   top: 0;
+//   right: 25px;
+//   font-size: 36px;
+//   margin-left: 50px;
+//   color:#fff;
+// }
+
+// .sidenav .closebtn:hover {
+//     color: rgb(199, 199, 199);
+// }
+
+// @media screen and (max-height: 450px) {
+//   .sidenav {padding-top: 15px;}
+//   .sidenav a {font-size: 18px;}
+// }
+
+
+.content {
+    margin-top: 30px;
+}
+
+.content2 {
+    margin-top: 40px !important;
+}
+
+.input  {
+    margin:auto !important;
+}
+
+.reset-link {
+    width: 100%;
+    font-style: italic;
+    color: #222;
+}
+
+
+.login-btn {
+    width:100%;
+    background-image: linear-gradient(to right, #FFA519, #FFC757) !important;
+    border:none !important;
+    padding:15px;
+    margin-top: 30px;
+}
+
+.alert-btn {
+    margin-top:0px;
+    font-weight:700;
+}
+
+.login-btn:focus {
+    box-shadow: none !important;
+}
+
+.input input {
+    border-top:none;
+    border-right:none;
+    border-left:none;
+    border-radius: 0px;
+    margin-bottom: 10px;
+    background-color: transparent;
+}
+
+.input input:focus {
+    background-color: transparent;
+    border-top:none;
+    border-right:none;
+    border-left:none;
+    box-shadow: none;
+    border-color:none !important;
+}
+
+.logo {
+    width: 300px;
+    margin: auto;
+}
+
+body {
+    // background-image: url('../img/back.jpg') !important;
+    background-size: cover;
+    background-color:#fafafa !important;
+    background-repeat: no-repeat;
+    color: #636b6f;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 200;
+    height: 100vh;
+}
+
+
+
+//Payments card
+
+
+.payments {
+    padding-left:0px !important;
+    padding-right:0px !important;
+    max-width:100% !important;
+} 
+
+.payments .card {
+    border-radius: 10px;
+}
+
+.payments p,
+.payments h2 {
+    padding:20px 0 0px 20px;
+    font-weight:700;
+}
+
+.payments .card-body {
+    padding:0px !important;
+}
+
+.data .payments b {
+    margin-left:20px;
+    font-weight:600;
+}
+
+.data .payments section {
+    margin-bottom:10px;
+    margin-top:10px;
+}
+
+.data .payments .padded-table {
+    margin-left:10px;
+    margin-right:10px;
+}
+
+.data .payments .range {
+    color: #E19200;
+    margin:0px 0px 30px 20px !important;
+}
+
+.data .payments .retrieve {
+    background-image: linear-gradient(to right, #FFA519, #FFC757) !important;
+    border:none !important;
+    color: #fff;
+    margin-left:20px;
+}
+
+
+.data .payments .datepicker::-webkit-placeholder,
+.data .payments .datepicker::-moz-placeholder,
+.data .payments .datepicker:-ms-placeholder,
+.data .payments .datepicker::placeholder {
+    color: #E19200 !important;
+}
+
+.data .payments .filter-input {
+    background-color: #fff;
+    color:#000;
+}
+
+//Password Reset Card
+
+.data .password-reset .card {
+    width:70%;
+    margin:auto;
+}
+
+.data .password-reset img {
+    width:200px;
+    margin-bottom:50px;
+}
+
+.data .password-reset form {
+    margin-top:50px;
+}
+
+.data .password-reset form input {
+    height: 50px;
+}
+
+//Topup card
+
+.data .topup .card {
+    width:70%;
+    margin:auto;
+}
+
+.data .topup .card .col-md-6 {
+    padding:0px !important;
+    text-align:center;
+}
+
+.data .topup .amounts button {
+    background-color: #fff;
+    padding:25px 70px;
+    font-weight:700;
+    font-size: inherit;
+    color:#FFA519;
+    margin:10px;
+    border-color: #888;
+    overflow:hidden;
+}
+
+.data .topup .amounts button:focus,
+.data .topup .amounts button:active {
+    background-color: #A1B3B7  !important;
+    color:#fff;
+    box-shadow:none !important;
+    border-color:none !important;
+}
+
+
+.data .topup form {
+    margin:20px;
+}
+
+.data .topup form input {
+    height:50px;
+}
+
+.data .topup .confirm button {
+    margin-top:0px !important;
+}
+
+//Energy Card
+
+.containerr {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.data .energy .card-header {
+    background-color: #343a40 !important;
+}
+
+ul.tabs{
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+}
+ul.tabs li{
+    background: none;
+    color: #666;
+    font-weight:700;
+    display: inline-block;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+ul.tabs li.current{
+    background-color: #A1B3B7;
+    color: #fff;
+    font-weight:700;
+    border-radius:5px;
+}
+
+.tab-content{
+    display: none;
+    padding: 15px 0px 15px 0px;
+}
+
+.tab-content.current{
+    display: inherit;
+}
+
+.admin {
+    padding-left:0px !important;
+    padding-right:0px !important;
+    max-width:100% !important;
+} 
+
+//General footer
+
+.page-footer {
+    background-color: #f8f9fa;
+    width:100%;
+    margin-top: 20px;
+    border-radius:10px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.page-footer p {
+    color:#FFA519;
+    margin-top:auto;
+    margin-bottom:auto;
+    font-size:30px;
+}
+
+.page-footer strong {
+    font-weight:700;
+}
+
+
+@media only screen and (max-width:768px) {
+    .logo {
+        width: 80%;
+    }
+
+    body {
+        background-position: center;
+        background-size: cover;
+    }
+
+    .data .payments .datepicker {
+        width:90% !important;
+        margin-left:auto;
+        margin-right:auto;
+    }
+
+    .data .password-reset .card,
+    .data .topup .card {
+        width:100%;
+    }
+
+    .data .topup .amounts button {
+    padding:10px 20px;
+    margin:5px;
+    font-size:inherit;
+}
+
+}
+
+@media only screen and (max-width:1024px) {
+    .logo {
+        width: 50%;
+    }
+    
+    body {
+        background-position: center;
+        background-size: cover;
+    }
+    .data .topup .amounts button {
+    padding:10px 20px;
+    margin:5px;
+    font-size:inherit;
+    }
+    
+}
+
+@media only screen and (max-width:1280px) {
+    .data .topup .amounts button {
+        font-size:inherit;
+    }
+}
