@@ -96,7 +96,11 @@ class CustomerController extends Controller
 										);
 		if($validator->fails())
 		{
-			return $response = array('errors' => $validator->getMessageBag()->toArray());
+		    $success="Error saving customer. Please contact the admin";
+            //$success['error']=$validator->getMessageBag()->toArray();
+            //$success = implode(",",$validator->getMessageBag()->toArray());
+            //return redirect('customers')->with('error', $validator->getMessageBag());
+			//return $response = array('errors' => $validator->getMessageBag()->toArray());
 		}
 		else
 		{
@@ -104,14 +108,15 @@ class CustomerController extends Controller
 			$customer_array['address']	=	$address;
 
 			if ($this->customers->insertRecord($customer_array)) {
-				$success = 'User Created Successfully!';
+				$success= 'User Created Successfully!';
 
-				Mail::to($email)->send(new RegisterMail($name, $email, $password));
+				Mail::to($email)->send(new RegisterMail($name, $email, $password,env('APP_URL')));
 
-            	return redirect('customers')->with('success', $success);
+
 			}
 
 		}
+        return redirect('customers')->with('success', $success);
     }
 
     /**
@@ -202,24 +207,22 @@ class CustomerController extends Controller
 				];
 
                 $transaction = array(
-                'company_name' => $myAPI->company_name,
-                'user_name' => $myAPI->username,
-                'password' => $myAPI->password,
-                'password_vend' => $myAPI->vending_password,
-                'meter_number' => $meter,
-                'amount' => $amount,
-                'email' => $email,
-                'id' => $id
-			);
+                    'company_name' => $myAPI->company_name,
+                    'user_name' => $myAPI->username,
+                    'password' => $myAPI->password,
+                    'password_vend' => $myAPI->vending_password,
+                    'meter_number' => $meter,
+                    'amount' => $amount,
+                    'email' => $email,
+                    'id' => $id
+			    );
 
-			$myPayment = new ApprovePayments;
-			if ($myPayment->approvePayments($transaction)) {
-				$success['success']='Payment Successful!';
-			} else {
-				$success['error']='Invalid Meter Number!';
-			}
-
-
+                $myPayment = new ApprovePayments;
+                if ($myPayment->approvePayments($transaction)) {
+                    $success['success']='Payment Successful!';
+                } else {
+                    $success['error']='Invalid Meter Number!';
+                }
 
             } else {
                 $success = ['error'=>'Payment Successful! API Details Not Set!'];

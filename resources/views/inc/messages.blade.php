@@ -20,6 +20,6 @@
     <div class="container">
         <div class="alert alert-danger">
             {{session('error')}}
-        </div>  
-    </div>  
+        </div>
+    </div>
 @endif

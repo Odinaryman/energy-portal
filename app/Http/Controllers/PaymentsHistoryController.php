@@ -19,9 +19,17 @@ class PaymentsHistoryController extends Controller
      */
     public function index()
     {
-        $payments = PaymentHistory::where('customer_id', Auth::user()->id)->orderBy('id', 'DESC')->take(20)->get();
-
-        return view('history')->with('payments', $payments);
+        $payments = PaymentHistory::where('customer_id', Auth::user()->id)->orderBy('id', 'DESC')->get();
+        $p=[];
+        foreach ($payments as $payment){
+            $t=explode(" ",$payment->created_at);
+            $date=date_create($payment->created_at);
+            $w=array('dates'=>$t[0],'times'=>date_format($date,"g:i a"),'token'=>$payment->token,'paid_amount'=>$payment->paid_amount,
+                'paid_unit'=>$payment->paid_unit);
+            array_push($p,$w);
+        }
+        //dd($p);
+        return view('history')->with('payments', $p);
     }
 
 
@@ -38,7 +46,7 @@ class PaymentsHistoryController extends Controller
         } else {
             array_push($inputs, $request->input('from'), $request->input('to'));
         }
-        dd($inputs);
+        //dd($inputs);
         $payments = PaymentHistory::whereBetween('created_at', [$inputs[0], $inputs[1]])->where('customer_id', Auth::user()->id)->get();
 
 

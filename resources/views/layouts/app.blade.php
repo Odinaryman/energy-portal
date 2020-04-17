@@ -56,55 +56,10 @@
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <script src="assets/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-    <script>
-
-        $('#date-picker1').daterangepicker({
-            singleDatePicker: true,
-            showDropdowns: true,
-            locale: {
-                cancelLabel: 'Clear',
-                format: 'YYYY-MM-DD'
-            },
-            minYear: 1901,
-
-            maxYear: parseInt(moment().format('YYYY'),10)
-        }, function(start, end, label) {
-            var years = moment().diff(start, 'years');
-            var from = start.format('YYYY-MM-DD');
-            $('#from').val(from);
-            // alert("You are " + years + " years old!");
-        });
-        $('#date-picker2').daterangepicker({
-            singleDatePicker: true,
-            showDropdowns: true,
-            locale: {
-                cancelLabel: 'Clear',
-                format: 'YYYY-MM-DD'
-            },
-            minYear: 1901,
-
-            maxYear: parseInt(moment().format('YYYY'),10)
-        }, function(start, end, label) {
-            var years = moment().diff(start, 'years');
-            var to = start.add(24, 'hour').format('YYYY-MM-DD');
-            $('#to').val(to);
-        });
-
-        function submit() {
-            var from = $('#from').val();
-            var to = $('#to').val();
-             if (from != '' && to != '') {
-                 $('#submit').click();
-             }
-        }
-
-    </script>
 
 
     @include('inc.pay')
@@ -117,7 +72,9 @@
     <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
 
     <script>
-        $('#table').DataTable();
+        $('#table').DataTable( {
+            "order": [[ 0, "desc" ]]
+        } );
     </script>
 
     <script src="{{ asset('js/app.js') }}" defer></script>

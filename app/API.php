@@ -32,7 +32,7 @@ class API extends Model
 					$meter_no	=	$customer->meter_no;
 					if(!isset($meter_no))
 					{
-						$meter_array['Meter not available'][$customer_id]	=	$customer->email;
+						$meter_array[$meter_no]['Meter not available'][$customer_id]	=	$customer->email;
 						continue;
 					}
 					else
@@ -43,7 +43,7 @@ class API extends Model
 						{
 
                             $date1=date_create(date("Y-m-d",strtotime("yesterday")));
-                            //$date1=date_create(date("Y-m-d",strtotime("8 April 2020")));
+                            //$date1=date_create(date("Y-m-d",strtotime("15 April 2020")));
                             $date2=date_format($date1,"Y/m/d");
                             if(!isset($customer->dates_unread) || $customer->dates_unread==''){
                                 array_push($dates_unread,$date2);
@@ -93,7 +93,7 @@ class API extends Model
                                 if ($err)
                                 {
                                     $checkCurlError=1;
-                                    $meter_array['cURL Error'][$customer_id]	=	$customer->email."//".$err;
+                                    $meter_array[$meter_no][$unread_dates]['cURL Error'][$customer_id]	=	$customer->email."//".$err;
                                     //echo "cURL Error #:" . $err;
                                 }
                                 else
@@ -136,7 +136,7 @@ class API extends Model
                                         {
                                             //dd($insert_array);
                                             DB::table('daily_readings')->insert($insert_array);
-                                            $meter_array['Daily Data Inserted'][$customer_id]	=	$customer->email;
+                                            $meter_array[$meter_no][$unread_dates]['Daily Data Inserted'][$customer_id]	=	$customer->email;
                                         }
                                         else if(!$daily_readings->reading_status)
                                         {
@@ -149,9 +149,9 @@ class API extends Model
                                                     ->where('month',$month)
                                                     ->where('year',$year)
                                                     ->update($insert_array);
-                                            }else $meter_array['Data already in table'][$customer_id]	=	$data;
+                                            }else $meter_array[$meter_no][$unread_dates]['Data already in table'][$customer_id]	=	$data;
 
-                                        }else $meter_array['Data already in table'][$customer_id]	=	$data;
+                                        }else $meter_array[$meter_no][$unread_dates]['Data already in table'][$customer_id]	=	$data;
 
                                     }
                                 }
@@ -160,7 +160,7 @@ class API extends Model
 						}
 						else
 						{
-							$meter_array['API Details not available'][$customer_id]	=	$customer->email;
+							$meter_array[$meter_no]['API Details not available'][$customer_id]	=	$customer->email;
 							continue;
 						}
 					}
@@ -177,7 +177,7 @@ class API extends Model
                         ->update($ar);
 				}
 			}
-			return array("status"=>"success","messge"=>"",'response'=>$meter_array);
+			return array("status"=>"success",'response'=>$meter_array);
 		}
 		else
 		{
@@ -201,7 +201,7 @@ class API extends Model
 					$meter_no	=	$customer->meter_no;
 					if(empty($meter_no))
 					{
-						$meter_array['Meter not available'][$customer_id]	=	$customer->email;
+						$meter_array[$meter_no]['Meter not available'][$customer_id]	=	$customer->email;
 						continue;
 					}
 					else
@@ -225,7 +225,10 @@ class API extends Model
 
                             $year=date("Y");
                             $month=date("m")-1;
-
+                            if(!$month){
+                                $month=12;
+                                $year=$year-1;
+                            }
 							$customer_array['QueryList'][]	= array(
 																"MeterNo"		=>	$meter_no,
 																"Year"			=>	$year,
@@ -251,7 +254,7 @@ class API extends Model
 							curl_close($curl);
 							if ($err)
 							{
-								$meter_array['cURL Error'][$customer_id]	=	$customer->email;
+								$meter_array[$meter_no]['cURL Error'][$customer_id]	=	$customer->email;
 							  //echo "cURL Error #:" . $err;
 							}
 							else
@@ -281,11 +284,11 @@ class API extends Model
 
 											$insert_array	=	array("customer_id"=>$customer_id,"year"=>$year,"month"=>$month,"units_used"=>$units_used,"units_remaining"=>$units_remaining);
 											DB::table('monthly_readings')->insert($insert_array);
-											$meter_array['Monthly Data Inserted'][$customer_id]	=	$customer->email;
+											$meter_array[$meter_no]['Monthly Data Inserted'][$customer_id]	=	$customer->email;
 										}
 										else
 										{
-											$meter_array['Data already in table'][$customer_id]	=	$data;
+											$meter_array[$meter_no]['Data already in table'][$customer_id]	=	$data;
 										}
 
 									}
@@ -342,8 +345,9 @@ class API extends Model
             $to = $email;
 
             if($trigger_1_status == false && $units_left < $trigger_unit_1 ) {
-				Mail::to($to)->send(new SendMail($name, $units_left));
-				if (Mail::failures()) {} else {
+                //dd($name,$to,$units_left);
+				Mail::to($to)->send(new SendMail($name, $units_left,env('APP_URL')));
+				if (Mail::failures()) {dd('here');} else {
                     DB::table('alarms')
                         ->where('customer_id', $user_id)
                         ->update(array('trigger_1_status' => true, 'trigger_unit_1'=>null));

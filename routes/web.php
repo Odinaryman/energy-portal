@@ -32,7 +32,6 @@ Route::get('/daily_data', 'APIController@getDailyData');
 Route::get('/monthly_data', 'APIController@getMonthlyData');
 
 
-
 Route::group(['middleware' => 'auth'], function () {
 
 

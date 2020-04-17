@@ -19,7 +19,7 @@ class APIController extends Controller
 		$response	=	$apiData->getUserDailyData();
 		dd($response);
     }
-	
+
 	public function getMonthlyData()
     {
 		$apiData	=	new API;
@@ -32,4 +32,5 @@ class APIController extends Controller
         $response   =   $apiData->sendAlarm();
         dd($response);
     }
+
 }

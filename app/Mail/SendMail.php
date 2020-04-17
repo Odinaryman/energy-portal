@@ -18,11 +18,13 @@ class SendMail extends Mailable
      */
     public $name;
     public $units_left;
+    public $url;
 
-    public function __construct($name, $units_left)
+    public function __construct($name, $units_left,$url)
     {
         $this->name = $name;
         $this->units_left = $units_left;
+        $this->url=$url;
     }
 
     /**
@@ -32,7 +34,8 @@ class SendMail extends Mailable
      */
     public function build()
     {
-        return $this->from(env('MAIL_FROM_ADDRESS'))
+
+        return $this->from(env('MAIL_FROM_ADDRESS'),env('MAIL_FROM_NAME'))
                     ->subject('Energy Alarm Warning!')
                     ->markdown('mails.alarm')
                     ->text('mails.alarm_plain');

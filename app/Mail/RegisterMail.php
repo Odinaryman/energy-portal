@@ -20,12 +20,14 @@ class RegisterMail extends Mailable
     public $name;
     public $user;
     public $password;
+    public $url;
 
-    public function __construct($name, $user, $password)
+    public function __construct($name, $user, $password,$url)
     {
         $this->name = $name;
         $this->user = $user;
         $this->password = $password;
+        $this->url=$url;
     }
 
     /**

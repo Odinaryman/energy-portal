@@ -1,13 +1,18 @@
 @component('mail::message')
-Hi, {{$name}}
+Dear {{$name}},
 
-You can now login to your NRGBEE account using the details below:<br>
+Your smart meter account has been activated on NRGBEE portal.<br>
+You can now login with the following credentials:<br>
 <p>UserID: <b>{{$user}}</b></p>
-<p>Password: <b>{{$password}}</b></p>
+<p>Password: <b>{{$password}}</b></p><br>
 
-@component('mail::button', ['url' => '{{url('/')}}'])
+@component('mail::button', ['url' => $url])
 Login
 @endcomponent
 
-Regards
+You are advised to change your password immediately, on your first login.<br>
+
+Regards,<br/>
+Team NRGBEE
+
 @endcomponent
