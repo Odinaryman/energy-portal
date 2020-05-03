@@ -32,13 +32,15 @@
                     <table id="table" class="table display table-bordered table-striped no-wrap">
                         <thead>
                             <tr>
-                                <th>Create Date</th>
+                                <th>Date Created</th>
+                                <th>Time Created</th>
+                                <th>Type</th>
                                 <th>User</th>
                                 <th>Token</th>
-                                <th>Price</th>
-                                <th>Unit</th>
-                                <th>Paid Amount</th>
-                                <th>Paid Unit</th>
+                                <!--<th>Price</th>-->
+                                <th>Amount Paid</th>
+                                <th>Unit(kWh)</th>
+                                <th>Made By</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,13 +49,20 @@
                                 @php
                                     date_default_timezone_set("Africa/Lagos");
                                 @endphp
-                                <td>{{$payment->created_at}}</td>
-                                <td>{{$payment->name}}</td>
-                                <td>{{$payment->token}}</td>
-                                <td>{{$payment->price}}</td>
-                                <td>{{$payment->unit}}</td>
-                                <td>{{$payment->paid_amount}}</td>
-                                <td>{{$payment->paid_unit}}</td>
+                                <td>{{$payment['dates']}}</td>
+                                <td>{{$payment['times']}}</td>
+                                @if($payment['payment_method'])<td>Debit Card</td>
+                                @else <td>Cash</td>
+                                @endif
+                                <td>{{$payment['name']}}</td>
+                                <td>{{$payment['token']}}</td>
+                                <td>{{$payment['paid_amount']}}</td>
+                                <td>{{$payment['paid_unit']}}</td>
+                                <td>
+                                    @if($payment['payment_maker']==$payment['customer_id']) Owner
+                                    @else Admin
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>

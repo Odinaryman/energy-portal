@@ -32,27 +32,25 @@
                     <table id="table" class="table display table-bordered table-striped no-wrap">
                         <thead>
                             <tr>
-                                <th>Create Date</th>
+                                <th>Date Created</th>
+                                <th>Time Created</th>
                                 <th>User</th>
                                 <th>Account Type</th>
                                 <th>Credit Amount</th>
-                                <th>Transaction ID</th>
                                 <th>Transaction Status</th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach ($payment_transactions as $payment)
-                            @php
-                                ($payment->transaction_status==1) ? $payment->transaction_status='Success' : $payment->transaction_status='Failed';
-                                date_default_timezone_set("Africa/Lagos");
-                            @endphp
                             <tr>
-                                <td>{{$payment->created_at}}</td>
-                                <td>{{$payment->user}}</td>
-                                <td>{{$payment->account_type}}</td>
-                                <td>{{$payment->credit_amount}}</td>
-                                <td>{{$payment->id}}</td>
-                                <td>{{$payment->transaction_status}}</td>
+                                <td>{{$payment['dates']}}</td>
+                                <td>{{$payment['times']}}</td>
+                                <td>{{$payment['name']}}</td>
+                                <td>{{$payment['account_type']}}</td>
+                                <td>{{$payment['credit_amount']}}</td>
+                                @if($payment['transaction_status']==1)<td>Success</td>
+                                @else <td>Failed</td>
+                                @endif
                             </tr>
                         @endforeach
                         </tbody>

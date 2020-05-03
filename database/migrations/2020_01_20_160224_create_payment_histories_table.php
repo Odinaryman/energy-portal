@@ -23,8 +23,10 @@ class CreatePaymentHistoriesTable extends Migration
             $table->string('vat')->default('');
             $table->string('currency')->default('');
             $table->string('unit');
+            $table->unsignedBigInteger('payment_maker');
             $table->unsignedBigInteger('paid_amount');
             $table->unsignedBigInteger('paid_unit');
+            $table->unsignedBigInteger('payment_method');
             $table->timestamps();
         });
     }

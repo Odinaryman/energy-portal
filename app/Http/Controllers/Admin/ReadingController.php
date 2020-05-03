@@ -16,7 +16,7 @@ class ReadingController extends Controller
         }
 
         $dailyReadings	=	new Reading;
-		$dailyReadings	=	$dailyReadings->dailyReadings();
+		$dailyReadings	=	$dailyReadings->dailyReadings(Auth::user()->id);
 		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
 			return view('admin.daily_readings', compact('dailyReadings'));
@@ -36,7 +36,7 @@ class ReadingController extends Controller
         }
 
         $monthlyReadings	=	new Reading;
-		$monthlyReadings	=	$monthlyReadings->monthlyReadings();
+		$monthlyReadings	=	$monthlyReadings->monthlyReadings(Auth::user()->id);
 		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
 			return view('admin.monthly_readings', compact('monthlyReadings'));

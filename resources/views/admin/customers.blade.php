@@ -49,38 +49,54 @@
             <div class="card-body">
             <a href="{{route('customers.create')}}" class="btn float-right btn-success loadajaxpage" style="margin-bottom:10px;"><i class="fas fa-plus-circle"></i> Create</a>
                 <h4 class="card-title">Customers</h4>
-                <div class="table-responsive m-t-40">
-                    <table id="table" class="table display table-bordered table-striped no-wrap">
+                <div style="font-size: 13px" class="table-responsive m-t-40">
+                    <table  id="table" class="table display table-bordered table-striped no-wrap">
                         <thead>
                             <tr>
-                                <th>Create Date</th>
+                                <th>Date Created</th>
                                 <th>Full Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
+                                <th>Admin</th>
                                 <th>Meter No</th>
+                                <th>DCU No</th>
+                                <th>Account Type</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
+
                         @foreach ($customers as $customer)
+
                             <tr>
                                 <td>{{$customer->created_at}}</td>
                                 <td>{{$customer->name}}</td>
                                 <td>{{$customer->email}}</td>
                                 <td>{{$customer->phone}}</td>
+                                <td>{{$customer->admin_id}}</td>
                                 <td>{{$customer->meter_no}}</td>
+                                <td>{{$customer->dcu_no}}</td>
                                 <td>
+                                    @if(!$customer->admin_level)User
+                                    @else Admin
+                                    @endif
+                                </td>
+                                <td style="font-size: 10px">
                                     {{-- Edit customer --}}
                                     <a class="loadajaxpage" href="customers/{{$customer->id}}/edit"><i class="fas fa-pencil-alt" title="Customer Details"></i></a>
-                                     | 
+                                     |
                                      {{-- Show customer API details --}}
                                       <a class="loadajaxpage" href="customerapidetails/{{$customer->id}}" title="Customer API Details"><i class="fas fa-file-alt"></i></a>
-                                      | 
+                                      |
                                       <a class="loadajaxpage" href="customers/{{$customer->id}}/topup" title="Topup"><i class="fas fa-money-bill-alt"></i></a>
-                                      | 
+                                      |
                                      {{-- Delete customer --}}
-                                     @if ($customer->isAdmin==0)
-                                         <a href="deleteCustomer/{{$customer->id}}"><i class="fas fa-trash-alt" title="Delete Customer"></i></span></a>
+                                     @if ($customer->admin_level!=2)
+                                        <a data-id="{{$customer->id}}" style="cursor: pointer" href="javascript:;" title="Delete User" data-toggle="modal" data-target="#deleteModal"
+                                           onclick="transferId(this)"><i class="fas fa-trash-alt"></i></a>
+                                        <!--<span data-id="{{$customer->id}}" id="edit-info" title="Delete User" data-toggle="modal" data-target="#deleteModal" onclick="transferId(this)">
+                                <i class='fas fa-trash-alt'></i>
+                            </span>-->
                                     </td>
                                      @endif
                             </tr>
@@ -93,6 +109,20 @@
         </div>
    </div>
 </div>
+<div id="deleteModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div style="text-align: center" class="modal-body">
+                <h3>Do you want to permanently delete this user</h3>
+                <p><i style="font-size: 40px" class="fas fa-question"></i></p>
+                <!--<a href="deleteCustomer/{{$customer->id}}"></a>-->
+                <a id="delete_submit" href="javascript:;" class="btn" style="background-color: #FFA519;color: white" >Delete</a>
+                <a href="javascript:;" data-dismiss="modal" class="btn">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -101,25 +131,33 @@
 
 
 <script>
-$(function () {
-	$('#config-table').DataTable({
-		responsive: true,
-		orderable: false
-	});
- });
+    function transferId(a){
+        var id=$(a).attr('data-id');
+        $('#delete_submit').attr('href','deleteCustomer/'+id);
+    }
+    $(function () {
+        /*$('#config-table').DataTable( {
+            responsive: true,
+            "order": [[ 0, "desc" ]]
+        } );*/
+        $('#config-table').DataTable({
+            responsive: true,
+            orderable: false
+        });
+     });
 </script>
             </div>
 
 @include('inc.confirm')
 
-        
+
 
 {{-- <footer class="page-footer">
 
   <!-- Copyright -->
   <div class="footer-copyright text-center py-3">
       <p><strong>NRG</strong> BEE</p>
-   
+
   </div>
   <!-- Copyright -->
 
@@ -136,4 +174,3 @@ $(function () {
 </div>
 @endsection
 
-   

@@ -1,4 +1,14 @@
 $(document).ready(function () {
+    var chart_height=400;
+    var chart_width=700;
+    var windowsize= $(window).width();
+    if (windowsize < 500 ) {
+        chart_height=300;
+        chart_width=330;
+    }else if(windowsize < 982){
+        chart_height=300;
+        chart_width=572;
+    }
 /******************************* Ajax Load Page**********************************/
 
     $('#sidebarCollapse').on('click', function () {
@@ -40,8 +50,8 @@ $(document).ready(function () {
                            2]);
 
           var options = {
-            width: 700,
-            height: 400,
+            width: chart_width,
+            height: chart_height,
               vAxis:{
                   title:'Unit Consumed (kWh)'
               },
@@ -73,8 +83,8 @@ $(document).ready(function () {
                              role: "annotation" },
                            2]);
             var options = {
-            width: 700,
-            height: 400,
+            width: chart_width,
+            height: chart_height,
                 vAxis:{
                     title:'Unit Consumed (kWh)'
                 },

@@ -31,7 +31,7 @@ class DashboardController extends Controller
      */
     public function dashboard()
     {
-        if (Auth::user()->isAdmin == true) {
+        if (Auth::user()->isAdmin) {
             return redirect('customers');
         }
         $data = DailyReading::where('customer_id', Auth::user()->id)

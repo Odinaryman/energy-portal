@@ -21,8 +21,8 @@ class API extends Model
 			foreach($customers as $customer)
 			{
 				$customer_id	=	$customer->id;
-                if($customer->email=='admin@admin.com')continue;
-				if($customer_id > 0)
+                if($customer->id==1)continue;
+				if($customer_id > 1)
 				{
 
                     $dates_unread=array();
@@ -43,7 +43,7 @@ class API extends Model
 						{
 
                             $date1=date_create(date("Y-m-d",strtotime("yesterday")));
-                            //$date1=date_create(date("Y-m-d",strtotime("15 April 2020")));
+                            //$date1=date_create(date("Y-m-d",strtotime("17 April 2020")));
                             $date2=date_format($date1,"Y/m/d");
                             if(!isset($customer->dates_unread) || $customer->dates_unread==''){
                                 array_push($dates_unread,$date2);
@@ -264,39 +264,39 @@ class API extends Model
 								$reason	=	$data['Reason'];
 								if($reason == 'OK')
 								{
-									$result					=	$data['Result'][0];
-									if(!empty($result) && $result['MeterNo'] > 0)
+
+                                    $result_check=$data['Result'];
+                                    $result	= $data['Result'][0];
+                                    //if(!isset($result['TotalUnitsCounter']))$result['TotalUnitsCounter']=0;
+
+                                    if(!(isset($result_check))){
+                                        $units_used	            =	0;
+                                        $units_remaining		=	0;
+                                        $month			        =	$month;
+                                        $year                   =   $year;
+                                    }else{
+                                        $year					=	$result['Year'];
+                                        $month					=	$result['Month'];
+                                        $units_used	            =	$result['TotalUnitsCounter'];
+                                        $units_remaining        =	$result['CurrentCreditRegister'];
+
+                                    }
+                                    $monthly_readings			=	DB::table('monthly_readings')
+																		->where('customer_id',$customer_id)
+																		->where('year',$year)
+																		->where('month',$month)
+																		->first();
+									if(empty($monthly_readings))
 									{
-										if(!isset($result['TotalUnitsCounter']))$result['TotalUnitsCounter']=0;
-										$MeterNo				=	$result['MeterNo'];
-										$year					=	$result['Year'];
-										$month					=	$result['Month'];
-										$units_used	            =	$result['TotalUnitsCounter'];
-										$units_remaining        =	$result['CurrentCreditRegister'];
 
-										$monthly_readings			=	DB::table('monthly_readings')
-																					->where('customer_id',$customer_id)
-																					->where('year',$year)
-																					->where('month',$month)
-																					->first();
-										if(empty($monthly_readings))
-										{
-
-											$insert_array	=	array("customer_id"=>$customer_id,"year"=>$year,"month"=>$month,"units_used"=>$units_used,"units_remaining"=>$units_remaining);
-											DB::table('monthly_readings')->insert($insert_array);
-											$meter_array[$meter_no]['Monthly Data Inserted'][$customer_id]	=	$customer->email;
-										}
-										else
-										{
-											$meter_array[$meter_no]['Data already in table'][$customer_id]	=	$data;
-										}
-
+									    $insert_array	=	array("customer_id"=>$customer_id,"year"=>$year,"month"=>$month,"units_used"=>$units_used,"units_remaining"=>$units_remaining);
+										DB::table('monthly_readings')->insert($insert_array);
+										$meter_array[$meter_no]['Monthly Data Inserted'][$customer_id]	=	$customer->email;
 									}
 									else
 									{
-										$meter_array['API Response'][$customer_id]	=	$data;
+										$meter_array[$meter_no]['Data already in table'][$customer_id]	=	$data;
 									}
-
 								}
 							}
 						}
@@ -345,7 +345,7 @@ class API extends Model
             $to = $email;
 
             if($trigger_1_status == false && $units_left < $trigger_unit_1 ) {
-                //dd($name,$to,$units_left);
+
 				Mail::to($to)->send(new SendMail($name, $units_left,env('APP_URL')));
 				if (Mail::failures()) {dd('here');} else {
                     DB::table('alarms')

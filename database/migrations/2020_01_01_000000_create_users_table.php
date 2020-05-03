@@ -22,11 +22,14 @@ class CreateUsersTable extends Migration
             $table->string('phone')->default('');
             $table->string('address')->default('');
             $table->string('meter_no')->default('');
+            $table->string('dcu_no')->default('');
             $table->string('last_login')->default('');
             $table->longText('dates_unread')->nullable();
-            // $table->string('date_created')->default('');
             $table->timestamps();
             $table->rememberToken();
+            $table->boolean('isAdmin')->default(false);
+            $table->integer('admin_level')->default(0);
+            $table->integer('admin_id')->nullable();
         });
 
     }

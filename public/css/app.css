@@ -13781,4 +13781,8 @@ a.article:hover {
   cursor: pointer;
   outline: none;
 }
+#edit-info{
+    cursor: pointer;
+    float: right;
+}
 

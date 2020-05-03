@@ -25,7 +25,8 @@ class PaymentsHistoryController extends Controller
             $t=explode(" ",$payment->created_at);
             $date=date_create($payment->created_at);
             $w=array('dates'=>$t[0],'times'=>date_format($date,"g:i a"),'token'=>$payment->token,'paid_amount'=>$payment->paid_amount,
-                'paid_unit'=>$payment->paid_unit);
+                'paid_unit'=>$payment->paid_unit,'payment_method'=>$payment->payment_method,'payment_maker'=>$payment->payment_maker,
+                'customer_id'=>$payment->customer_id);
             array_push($p,$w);
         }
         //dd($p);

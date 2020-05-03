@@ -11,6 +11,7 @@ use App\Mail\SendMail;
 use App\Alarm;
 use Auth;
 use DB;
+use App\User;
 
 
 class AlarmsController extends Controller
@@ -31,7 +32,7 @@ class AlarmsController extends Controller
 			return redirect('dashboard');
         }
 
-        $alarms	=	$this->alarms->getAllAlarms();
+        $alarms	=	$this->alarms->getAllAlarms(Auth::user()->id);
 		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
 			return view('alarms', compact('alarms'));
@@ -122,12 +123,27 @@ class AlarmsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+
+    public function update(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required',
+            'phone' => 'required',
+            'address' => 'required'
+        ]);
+
+        $user = User::where('id', Auth::user()->id)->first();
+        $user->name=$request->input('name');
+        $user->phone=$request->input('phone');
+        $user->address=$request->input('address');
+        //dd($user);
+        if($user->save()) {
+            $success = 'Your account update was successful!';
+            return redirect('account')->with('success', $success);
+        }
+
     }
 
     /**

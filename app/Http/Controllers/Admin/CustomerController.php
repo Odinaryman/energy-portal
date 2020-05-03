@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RegisterMail;
 use Illuminate\Validation\Rule;
@@ -29,15 +30,25 @@ class CustomerController extends Controller
 		if (Auth::user()->isAdmin != true) {
 			return redirect('dashboard');
 		}
+        if(Auth::user()->admin_level==2)$customers	=	$this->customers->getAllRecords(0);
+		else $customers	=	$this->customers->getAllRecords(Auth::user()->id);
 
-		$customers	=	$this->customers->getAllRecords();
+		foreach($customers as $customer){
+            $users=DB::table('users')
+                ->where('id', $customer->admin_id)
+                ->first();
+            //$customer->created_at=explode(" ",$customer->created_at)[0];
+            if(isset($customer->admin_id) && isset($users->name))$customer->admin_id=$users->name;
+            else $customer->admin_id='';
+        }
+		//dd($customers);
 		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
 			return view('admin.customers', compact('customers'));
 		}
 		else
 		{
-			$page 		=	"customers";
+			//$page 		=	"customers";
 			return view('admin.customers', compact('customers'));
 		}
 
@@ -51,14 +62,18 @@ class CustomerController extends Controller
     {
 		$method		=	"POST";
 		$action		=	"/customers/create";
+        $users=DB::table('users')
+            ->where('isAdmin', true)
+            ->get();
+        //dd($users);
 		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
-			return view('admin.customer',compact('method','action'));
+			return view('admin.customer',compact('users','method','action'));
 		}
 		else
 		{
 			$page	=	"customer";
-			return view('admin.customer', compact('method','action'));
+			return view('admin.customer', compact('users','method','action'));
 		}
 
     }
@@ -71,50 +86,35 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        $name		=	$request->input('name');
+        $email		=	$request->input('email');
+        $password	=	$request->input('password');
 
-		$this->validate($request, [
-            'name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            'phone' => 'required',
-            'address' => 'required',
-            'meter_no' => 'required'
-		]);
-
-		$name		=	$request->input('name');
-		$email		=	$request->input('email');
-		$password	=	$request->input('password');
-		$phone		=	$request->input('phone');
-		$address	=	$request->input('address');
-		$meter_no	=	$request->input('meter_no');
-
-
-		$customer_array	=	array('name'=>$name,'email'=>$email,'password'=>$password,'meter_no'=>$meter_no);
-
-		$validator 	=	Validator::make($customer_array	,
-										array('name'=>'required','email'=>'required|email|unique:users','password'=>'required|min:8','meter_no'=>'required|unique:users')
-										);
+        $customer_array=$request->all();
+        //dd($request->all());
+        if($request->input('admin_level')=='1'){
+            $validator 	=	Validator::make($customer_array	,
+                array('name'=>'required','email'=>'required|email|unique:users','password'=>'required|min:8',
+                    'meter_no'=>'nullable|unique:users','dcu_no'=>'required|unique:users',
+                    'admin_level'=>'required')
+            );
+        }else{
+            $validator 	=	Validator::make($customer_array	,
+                array('name'=>'required','email'=>'required|email|unique:users','password'=>'required|min:8',
+                    'meter_no'=>'required|unique:users','admin_level'=>'required','admin_id' => 'required')
+            );
+        }
 		if($validator->fails())
 		{
-		    $success="Error saving customer. Please contact the admin";
-            //$success['error']=$validator->getMessageBag()->toArray();
-            //$success = implode(",",$validator->getMessageBag()->toArray());
-            //return redirect('customers')->with('error', $validator->getMessageBag());
-			//return $response = array('errors' => $validator->getMessageBag()->toArray());
+		    $success=$validator->errors()->first();
+
 		}
 		else
 		{
-			$customer_array['phone']	=	$phone;
-			$customer_array['address']	=	$address;
-
 			if ($this->customers->insertRecord($customer_array)) {
 				$success= 'User Created Successfully!';
-
 				Mail::to($email)->send(new RegisterMail($name, $email, $password,env('APP_URL')));
-
-
 			}
-
 		}
         return redirect('customers')->with('success', $success);
     }
@@ -141,15 +141,18 @@ class CustomerController extends Controller
 		$method		=	"POST";
 		$action		=	"/customers/edit";
 		$customers	=	$this->customers->getRecord($id);
+        $users=DB::table('users')
+            ->where('isAdmin', true)
+            ->get();
        // dd($customers);
 		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
-			return view('admin.customer',compact('customers','method','action'));
+			return view('admin.customer',compact('customers','users','method','action'));
 		}
 		else
 		{
 			$page	=	"customer";
-			return view('admin.customer', compact('customers','method','action', 'id'));
+			return view('admin.customer', compact('customers','users','method','action', 'id'));
 
 		}
 	}
@@ -214,6 +217,7 @@ class CustomerController extends Controller
                     'meter_number' => $meter,
                     'amount' => $amount,
                     'email' => $email,
+                    'payment_method'=>0,
                     'id' => $id
 			    );
 
@@ -243,59 +247,43 @@ class CustomerController extends Controller
      */
     public function update(Request $request)
     {
-		$this->validate($request, [
+		/*$this->validate($request, [
             'customer_id' => 'required',
             'name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
             'phone' => 'required',
-            'address' => 'required',
-            'meter_no' => 'required'
-		]);
+            'address' => 'required'
+		]);*/
+        $id = $request->input('customer_id');
+        $customer_array=$request->all();
+        //dd($request->all());
+        if($request->input('admin_level')=='1'){
+            $validator 	=	Validator::make($customer_array	,
+                array('name'=>'required','email'=>'required|email|unique:users,email,'. $id.',id',
+                    'meter_no'=>'nullable|unique:users,meter_no,'.$id,'dcu_no'=>'required|unique:users,dcu_no,'.$id,
+                    'admin_level'=>'required')
+            );
+        }else{
+            $validator 	=	Validator::make($customer_array	,
+                array('name'=>'required','email'=>'required|email|unique:users,email,'. $id.',id',
+                    'meter_no'=>'required|unique:users,meter_no,'.$id,'admin_level'=>'required','admin_id' => 'required')
+            );
+        }
+        if($validator->fails())
+        {
+            $success=$validator->errors()->first();
 
-		$id = $request->input('customer_id');
+        }
+        else
+        {
+            if ($this->customers->updateRecord($customer_array,$id)) {
+                $success = 'User Updated Successfully!';
 
-       	$name		=	$request->input('name');
-		$email		=	$request->input('email');
-		$password	=	$request->input('password');
-		$phone		=	$request->input('phone');
-		$address	=	$request->input('address');
-		$meter_no	=	$request->input('meter_no');
-
-		$customer_array	=	array('name'=>$name,'email'=>$email,'password'=>$password,'meter_no'=>$meter_no);
-		$validator 	=	Validator::make($customer_array	,
-										array(	'name'=>'required',
-												//'email'=>"required|email|unique:customers",
-												'email' => [
-													'required',
-													'email',
-													Rule::unique('users')->ignore($id,'id'),
-												],
-												'password' => [
-													'required',
-													'min:8',
-													Rule::unique('users')->ignore($id,'id'),
-												]
-												//'password'=>'required|min:8','meter_no'=>'required|unique:customers'
-												)
-										);
-		if($validator->fails())
-		{
-			return $response = array('errors' => $validator->getMessageBag()->toArray());
-		}
-		else
-		{
-			$customer_array['phone']	=	$phone;
-			$customer_array['address']	=	$address;
+            }
+        }
+        return redirect('customers')->with('success', $success);
 
 
-			if ($this->customers->updateRecord($customer_array,$id)) {
-				$success = 'User Updated Successfully!';
 
-            	return redirect('customers')->with('success', $success);
-			}
-			// return $response		= 	array('success' => "Data updated successfully.");
-		}
     }
 
     /**

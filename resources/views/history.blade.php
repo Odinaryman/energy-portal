@@ -34,10 +34,11 @@
                                                         <tr>
                                                             <th>Date</th>
                                                             <th>Time</th>
+                                                            <th>Payment Method</th>
                                                             <th>Token</th>
                                                             <th>Amount</th>
-                                                            <th>Units</th>
-
+                                                            <th>Units(kWh)</th>
+                                                            <td>Paid By</td>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
@@ -45,18 +46,29 @@
 
                                                                 <tr>
                                                                     <td>-</td>
-                                                                    <td>-</td
                                                                     <td>-</td>
                                                                     <td>-</td>
+                                                                    <td>-</td>
+                                                                    <td>-</td>
+                                                                    <td></td>
+                                                                    <td></td>
                                                                 </tr>
                                                             @else
                                                                 @foreach ($payments as $payment)
                                                                     <tr>
                                                                         <td>{{$payment['dates']}}</td>
                                                                         <td>{{$payment['times']}}</td>
+                                                                        @if($payment['payment_method'])<td>Debit Card</td>
+                                                                        @else <td>Cash</td>
+                                                                        @endif
                                                                         <td>{{$payment['token']}}</td>
                                                                         <td>{{$payment['paid_amount']}}</td>
                                                                         <td>{{$payment['paid_unit']}}</td>
+                                                                        <td>
+                                                                            @if($payment['payment_maker']==$payment['customer_id']) Owner
+                                                                            @else Admin
+                                                                            @endif
+                                                                        </td>
                                                                     </tr>
                                                                 @endforeach
                                                             @endif

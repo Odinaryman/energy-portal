@@ -143,10 +143,11 @@ class PaymentsController extends Controller
                 'meter_number' => $meter,
                 'amount' => $credit_amount,
                 'email' => $email,
-                'id' => Auth::user()->id
+                'payment_method' => 1,
+                'id' => Auth::user()->id,
             );
 
-            $myPayment = new ApprovePayments;
+            $myPayment = new ApprovePayments();
             if ($myPayment->approvePayments($transaction)) {
                 $success = 'Payment Successful!';
             }

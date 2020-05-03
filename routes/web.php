@@ -45,7 +45,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/topup', 'DashboardController@topup');
     // Route::get('/paymentHistory', 'DashboardController@history');
     Route::get('/energy', 'DashboardController@energy');
-    Route::resource('alarms', 'AlarmsController');
+    Route::post('/info/edit', 'AlarmsController@update');
+
 
 
     Route::get('/paymentHistoryFilter', 'PaymentsHistoryController@filter');
