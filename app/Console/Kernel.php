@@ -26,21 +26,28 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('command:Alarm')
+
+        /*$schedule->command('command:Alarm')
+            ->twiceDaily(2, 15);
+        $schedule->command('command:Daily')
+            ->twiceDaily(1, 16);
+        $schedule->command('command:Monthly')
+            ->twiceDaily(2, 15);
+        /*$schedule->command('command:Alarm')
                   ->everyMinute();
         $schedule->command('command:Daily')
                   ->everyMinute();
         $schedule->command('command:Monthly')
-                  ->everyMinute();
+                  ->everyMinute();*/
 
-        /**$schedule->command('command:Alarm')
-                 ->cron('1 0 * * *');
+        $schedule->command('command:Alarm')
+                 ->cron('1 2,14 * * *');
         $schedule->command('command:Daily')
-                 ->cron('30 0 * * *');
+                 ->cron('30 1,13 * * *');
         $schedule->command('command:Monthly')
                  ->cron('0 1 1 * *');
 
-            $schedule->command('command:Alarm')
+            /*$schedule->command('command:Alarm')
                  ->dailyAt(16:25);
             $schedule->command('command:Daily')
                  ->dailyAt(16:23);

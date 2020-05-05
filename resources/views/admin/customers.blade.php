@@ -116,7 +116,6 @@
             <div style="text-align: center" class="modal-body">
                 <h3>Do you want to permanently delete this user</h3>
                 <p><i style="font-size: 40px" class="fas fa-question"></i></p>
-                <!--<a href="deleteCustomer/{{$customer->id}}"></a>-->
                 <a id="delete_submit" href="javascript:;" class="btn" style="background-color: #FFA519;color: white" >Delete</a>
                 <a href="javascript:;" data-dismiss="modal" class="btn">Cancel</a>
             </div>

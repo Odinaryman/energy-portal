@@ -38,7 +38,7 @@
                             <select required name="admin_id" class="form-control" id="admin_id">
                                 <option disabled <?php if(!isset($customers->id)) echo "selected"; ?>>Select the account admin</option>
                                 <?php $admin=[];$admin_id=[]; if(!empty($users)){ foreach ($users as $user){  $ad=$user->name."(".$user->dcu_no.")";array_push($admin_id,$user->id);array_push($admin,$ad); ?>
-                                <option <?php if(!empty($customers->admin_id) && $customers->admin_id==$user->id) echo "selected"; ?> value="<?php echo $user->id ?>>"><?php echo $user->name."(".$user->dcu_no.")" ?></option>
+                                <option <?php if(!empty($customers->admin_id) && $customers->admin_id==$user->id) echo "selected"; ?> value="<?php echo $user->id ?>"><?php echo $user->name."(".$user->dcu_no.")" ?></option>
                                 <?php }} ?>
                             </select>
                         </div>

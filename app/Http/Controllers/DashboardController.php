@@ -99,7 +99,7 @@ class DashboardController extends Controller
 
     public function energy() {
 
-        $datas = DailyReading::where('customer_id', Auth::user()->id)->orderBy('id', 'DESC')->take(16)->get();
+        $datas = DailyReading::where('customer_id', Auth::user()->id)->orderBy('id', 'DESC')->take(11)->get();
 
         $daily_array = [
                 'daily_values' => [[0, 0]],

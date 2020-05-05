@@ -22,6 +22,7 @@ class API extends Model
 			{
 				$customer_id	=	$customer->id;
                 if($customer->id==1)continue;
+                if(!isset($customer->meter_no) || empty($customer->meter_no))continue;
 				if($customer_id > 1)
 				{
 
@@ -30,140 +31,133 @@ class API extends Model
                     if(isset($customer->dates_unread) && $customer->dates_unread!='')$dates_unread=unserialize($customer->dates_unread);
 
 					$meter_no	=	$customer->meter_no;
-					if(!isset($meter_no))
+
+					//$meter_array['Meter available'][$customer_id]	=	$customer->email;
+					$customer_api_details	=	DB::table('api_details')->where('customer_id',$customer_id)->first();
+					if(!empty($customer_api_details))
 					{
-						$meter_array[$meter_no]['Meter not available'][$customer_id]	=	$customer->email;
-						continue;
+					    $date1=date_create(date("Y-m-d",strtotime("yesterday")));
+                        //$date1=date_create(date("Y-m-d",strtotime($real)));
+                        $date2=date_format($date1,"Y/m/d");
+                        if(!isset($customer->dates_unread) || $customer->dates_unread==''){
+                            array_push($dates_unread,$date2);
+
+                        }else{
+                            if(!in_array($date2, $dates_unread))array_push($dates_unread,$date2);
+                        }
+                        $num=0;
+                        foreach($dates_unread as $unread_dates){
+                            $checkCurlError=0;
+                            $dat=(explode("/",$unread_dates));
+                            $year=$dat[0];
+                            $month=$dat[1];
+                            $day=$dat[2];
+                            $company_name	= 	$customer_api_details->company_name;
+                            $username		= 	$customer_api_details->username;
+                            $password 		= 	$customer_api_details->password;
+                            $url			=	'https://prepayment.calinhost.com/api/COMM_DailyData';
+                            $customer_array	= array(
+                                "CompanyName"	=> $company_name,
+                                "UserName"		=> $username,
+                                "Password" 		=> $password
+                            );
+                            $customer_array['QueryList'][]	= array(
+                                "MeterNo"		=>	$meter_no,
+                                "Year"			=>	$year,
+                                "Month"			=>	$month,
+                                "Day"			=>	$day
+                            );
+                            $data_string = json_encode($customer_array);
+                            // print_r($data_string);
+                            $curl = curl_init($url);
+                            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
+                            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+                            curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
+                            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                                    'Content-Type: application/json',
+                                    'Content-Length: ' . strlen($data_string))
+                            );
+                            curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+                            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+                            $response = curl_exec($curl);
+                            $err = curl_error($curl);
+                            curl_close($curl);
+                            if ($err)
+                            {
+                                $checkCurlError=1;
+                                $meter_array[$meter_no][$unread_dates]['cURL Error'][$customer_id]	=	$customer->email."//".$err;
+                                //echo "cURL Error #:" . $err;
+                            }
+                            else
+                            {
+                                $data	=	json_decode($response,true);
+                                //$meter_array['API response']	=	$data;
+                                $reason	=	$data['Reason'];
+                                if($reason == 'OK')
+                                {
+                                    $result_check=$data['Result'];
+                                    $result	= $data['Result'][0];
+                                    if(!isset($result['TotalUnitsCounter']))$result['TotalUnitsCounter']=0;
+
+                                    if(!(isset($result_check))){
+                                        $units_used	            =	0;
+                                        $units_remaining		=	0;
+                                        $meter_status			=	0;
+                                        $rd_st                  =   0;
+                                    }else{
+                                        $units_used	            =	$result['TotalUnitsCounter'];
+                                        $units_remaining		=	$result['CurrentCreditRegister'];
+                                        $meter_status			=	$result['RelayStatus'];
+                                        $year                   =   $result['Year'];
+                                        $month                  =   $result['Month'];
+                                        $day                    =   $result['Day'];
+                                        $rd_st                  =   1;
+                                        unset($dates_unread[$num]);
+                                    }
+
+                                    $daily_readings			=	DB::table('daily_readings')
+                                        ->where('customer_id',$customer_id)
+                                        ->where('day',$day)
+                                        ->where('month',$month)
+                                        ->where('year',$year)
+                                        ->get()
+                                        ->first();
+                                    //dd($daily_readings);
+                                    $insert_array	=	array("customer_id"=>$customer_id,"reading_status"=>$rd_st,"day"=>$day,"month"=>$month,"year"=>$year,"units_used"=>$units_used,"units_remaining"=>$units_remaining,"meter_status"=>$meter_status);
+                                    if(empty($daily_readings))
+                                    {
+                                        //dd($insert_array);
+                                        DB::table('daily_readings')->insert($insert_array);
+                                        $meter_array[$meter_no][$unread_dates]['Daily Data Inserted'][$customer_id]	=	$customer->email;
+                                    }
+                                    else if(!$daily_readings->reading_status)
+                                    {
+                                        if($rd_st){
+                                            $insert_array["reading_status"]=$rd_st;
+                                            //dd($insert_array);
+                                            DB::table('daily_readings')
+                                                ->where('customer_id',$customer_id)
+                                                ->where('day',$day)
+                                                ->where('month',$month)
+                                                ->where('year',$year)
+                                                ->update($insert_array);
+                                        }else $meter_array[$meter_no][$unread_dates]['Data already in table'][$customer_id]	=	$data;
+
+                                    }else $meter_array[$meter_no][$unread_dates]['Data already in table'][$customer_id]	=	$data;
+
+                                }
+                            }
+                            $num++;
+                        }
 					}
 					else
 					{
-						//$meter_array['Meter available'][$customer_id]	=	$customer->email;
-						$customer_api_details	=	DB::table('api_details')->where('customer_id',$customer_id)->first();
-						if(!empty($customer_api_details))
-						{
-
-                            $date1=date_create(date("Y-m-d",strtotime("yesterday")));
-                            //$date1=date_create(date("Y-m-d",strtotime("17 April 2020")));
-                            $date2=date_format($date1,"Y/m/d");
-                            if(!isset($customer->dates_unread) || $customer->dates_unread==''){
-                                array_push($dates_unread,$date2);
-
-                            }else{
-                                if(!in_array($date2, $dates_unread))array_push($dates_unread,$date2);
-                            }
-                            $num=0;
-                            foreach($dates_unread as $unread_dates){
-                                $checkCurlError=0;
-                                $dat=(explode("/",$unread_dates));
-                                $year=$dat[0];
-                                $month=$dat[1];
-                                $day=$dat[2];
-                                $company_name	= 	$customer_api_details->company_name;
-                                $username		= 	$customer_api_details->username;
-                                $password 		= 	$customer_api_details->password;
-                                $url			=	'https://prepayment.calinhost.com/api/COMM_DailyData';
-                                $customer_array	= array(
-                                    "CompanyName"	=> $company_name,
-                                    "UserName"		=> $username,
-                                    "Password" 		=> $password
-                                );
-                                $customer_array['QueryList'][]	= array(
-                                    "MeterNo"		=>	$meter_no,
-                                    "Year"			=>	$year,
-                                    "Month"			=>	$month,
-                                    "Day"			=>	$day
-                                );
-                                $data_string = json_encode($customer_array);
-                                // print_r($data_string);
-                                $curl = curl_init($url);
-                                curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
-                                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-                                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-                                curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-                                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                                curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                                        'Content-Type: application/json',
-                                        'Content-Length: ' . strlen($data_string))
-                                );
-                                curl_setopt($curl, CURLOPT_TIMEOUT, 5);
-                                curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-                                $response = curl_exec($curl);
-                                $err = curl_error($curl);
-                                curl_close($curl);
-                                if ($err)
-                                {
-                                    $checkCurlError=1;
-                                    $meter_array[$meter_no][$unread_dates]['cURL Error'][$customer_id]	=	$customer->email."//".$err;
-                                    //echo "cURL Error #:" . $err;
-                                }
-                                else
-                                {
-                                    $data	=	json_decode($response,true);
-                                    //$meter_array['API response']	=	$data;
-                                    $reason	=	$data['Reason'];
-                                    if($reason == 'OK')
-                                    {
-                                        $result_check=$data['Result'];
-                                        $result	= $data['Result'][0];
-                                        if(!isset($result['TotalUnitsCounter']))$result['TotalUnitsCounter']=0;
-
-                                        if(!(isset($result_check))){
-                                            $units_used	            =	0;
-                                            $units_remaining		=	0;
-                                            $meter_status			=	0;
-                                            $rd_st                  =   0;
-                                        }else{
-                                            $units_used	            =	$result['TotalUnitsCounter'];
-                                            $units_remaining		=	$result['CurrentCreditRegister'];
-                                            $meter_status			=	$result['RelayStatus'];
-                                            $year                   =   $result['Year'];
-                                            $month                  =   $result['Month'];
-                                            $day                    =   $result['Day'];
-                                            $rd_st                  =   1;
-                                            unset($dates_unread[$num]);
-                                        }
-
-                                        $daily_readings			=	DB::table('daily_readings')
-                                            ->where('customer_id',$customer_id)
-                                            ->where('day',$day)
-                                            ->where('month',$month)
-                                            ->where('year',$year)
-                                            ->get()
-                                            ->first();
-                                        //dd($daily_readings);
-                                        $insert_array	=	array("customer_id"=>$customer_id,"reading_status"=>$rd_st,"day"=>$day,"month"=>$month,"year"=>$year,"units_used"=>$units_used,"units_remaining"=>$units_remaining,"meter_status"=>$meter_status);
-                                        if(empty($daily_readings))
-                                        {
-                                            //dd($insert_array);
-                                            DB::table('daily_readings')->insert($insert_array);
-                                            $meter_array[$meter_no][$unread_dates]['Daily Data Inserted'][$customer_id]	=	$customer->email;
-                                        }
-                                        else if(!$daily_readings->reading_status)
-                                        {
-                                            if($rd_st){
-                                                $insert_array["reading_status"]=$rd_st;
-                                                //dd($insert_array);
-                                                DB::table('daily_readings')
-                                                    ->where('customer_id',$customer_id)
-                                                    ->where('day',$day)
-                                                    ->where('month',$month)
-                                                    ->where('year',$year)
-                                                    ->update($insert_array);
-                                            }else $meter_array[$meter_no][$unread_dates]['Data already in table'][$customer_id]	=	$data;
-
-                                        }else $meter_array[$meter_no][$unread_dates]['Data already in table'][$customer_id]	=	$data;
-
-                                    }
-                                }
-                                $num++;
-                            }
-						}
-						else
-						{
-							$meter_array[$meter_no]['API Details not available'][$customer_id]	=	$customer->email;
-							continue;
-						}
+					    $meter_array[$meter_no]['API Details not available'][$customer_id]	=	$customer->email;
+						continue;
 					}
+
                     if(!count($dates_unread))$dates_unread=null;
                     else{
                         $ar=array_values($dates_unread);
@@ -194,8 +188,9 @@ class API extends Model
             $meter_array	=	array();
 			foreach($customers as $customer)
 			{
-				$customer_id	=	$customer->id;
-
+                if($customer->id==1)continue;
+                if(!isset($customer->meter_no) || empty($customer->meter_no))continue;
+                $customer_id	=	$customer->id;
 				if($customer_id > 0)
 				{
 					$meter_no	=	$customer->meter_no;
@@ -222,7 +217,8 @@ class API extends Model
 														"UserName"		=> $username,
 														"Password" 		=> $password
 														);
-
+                            /*$year=date("Y",strtotime($real));
+                            $month=date("m",strtotime($real));*/
                             $year=date("Y");
                             $month=date("m")-1;
                             if(!$month){

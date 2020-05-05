@@ -4,7 +4,7 @@ $(document).ready(function () {
     var windowsize= $(window).width();
     if (windowsize < 500 ) {
         chart_height=300;
-        chart_width=330;
+        chart_width=400;
     }else if(windowsize < 982){
         chart_height=300;
         chart_width=572;
